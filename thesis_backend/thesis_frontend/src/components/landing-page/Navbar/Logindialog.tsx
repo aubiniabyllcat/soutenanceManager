@@ -1,59 +1,55 @@
 "use client";
 
-import { Dialog, Transition } from '@headlessui/react'
-import { Fragment, useState } from 'react'
-import { X } from 'lucide-react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation'
+import { Dialog, Transition } from "@headlessui/react";
+import { Fragment, useState } from "react";
+import { X } from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
-  const [username, setusername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleLogin = async (e: { preventDefault: () => void; }) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
     if (!username || !password) {
-      console.error('Veuillez entrer un nom d\'utilisateur et un mot de passe.');
+      setError("Veuillez entrer un nom d'utilisateur et un mot de passe.");
       return;
     }
 
     const formData = {
       username: username,
-      password: password
+      password: password,
     };
 
-    console.log('FormData:', formData);
-
     try {
-      const response = await fetch('http://localhost:8000/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+      const response = await fetch("http://localhost:8000/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
       });
 
       const responseData = await response.json();
 
       if (response.ok) {
-            console.log('Login successful:', responseData);
-            localStorage.setItem('accessToken', responseData.access_token);
-            localStorage.setItem('tokenType', responseData.token_type);
-            localStorage.setItem('userInfo', JSON.stringify(responseData.user_info));
-            console.log(localStorage);
-            
-        router.push('/dashboard'); // Redirection vers le dashboard
+        localStorage.setItem("accessToken", responseData.access_token);
+        localStorage.setItem("tokenType", responseData.token_type);
+        localStorage.setItem(
+          "userInfo",
+          JSON.stringify(responseData.user_info)
+        );
+        router.push("/dashboard");
       } else {
-        console.error('Login failed:', response.statusText);
-        console.error('Response body:', responseData);
+        setError(`Échec de la connexion : ${response.statusText}`);
       }
     } catch (error) {
-      console.error('An error occurred during login:', error);
+      setError(`Une erreur est survenue lors de la connexion : ${error.message}`);
     }
   };
-
-
 
   return (
     <>
@@ -65,6 +61,11 @@ const Login = () => {
                 <div className="mb-12">
                   <h3 className="text-3xl font-extrabold">Connexion </h3>
                 </div>
+                {error && (
+                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    <span className="block sm:inline">{error}</span>
+                  </div>
+                )}
                 <div>
                   <label className="text-xs block mb-2">Login</label>
                   <div className="relative flex items-center">
@@ -74,7 +75,7 @@ const Login = () => {
                       className="w-full text-sm border-b border-gray-300 focus:border-[#333] px-2 py-3 outline-none"
                       placeholder="Entrez votre login"
                       value={username}
-                      onChange={(e) => setusername(e.target.value)}
+                      onChange={(e) => setUsername(e.target.value)}
                     />
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -138,9 +139,6 @@ const Login = () => {
                     Valider
                   </button>
                 </div>
-                <p className="my-8 text-sm text-gray-400 text-center">
-                  ou continuer avec
-                </p>
                 <div className="space-x-8 flex justify-center">
                   <button type="button" className="border-none outline-none">
                     {/* SVG code for Google icon */}

@@ -134,9 +134,7 @@ const Login = () => {
                     Valider
                   </button>
                 </div>
-                <p className="my-8 text-sm text-gray-400 text-center">
-                  ou continuer avec
-                </p>
+                
                 <div className="space-x-8 flex justify-center">
                   <button type="button" className="border-none outline-none">
                     {/* SVG code for Google icon */}
