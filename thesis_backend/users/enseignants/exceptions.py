@@ -8,6 +8,12 @@ class EnseignantExceptions:
             status_code=status.HTTP_404_NOT_FOUND,
             detail='Enseignant non trouvé'
         )
+    @property
+    def enseignant_exists(self):
+        return HTTPException (
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail='Cet enseignant existe déjà'
+    )
 
     @property
     def empty_data(self):

@@ -10,7 +10,7 @@ class EtudiantRepositoriesInterface(ABC):
 
     @abstractmethod
     async def create_etudiant(
-            self, utilisateur_id: int, etudiant_data: CreateEtudiantSchema):
+            self, etudiant_data: CreateEtudiantSchema):
         pass
 
     @abstractmethod

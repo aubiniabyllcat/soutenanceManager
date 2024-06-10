@@ -1,3 +1,5 @@
+from requests import delete
+from users.auth.exceptions import AuthExceptions
 from .interfaces.repositories_interface import UserRepositoriesInterface
 from dataclasses import dataclass
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -26,5 +28,4 @@ class UserRepositories(UserRepositoriesInterface):
         stmt = select(Users).where(Users.username == username)
         result = await self.session.execute(statement=stmt)
         return result.scalars().first()
-    
     

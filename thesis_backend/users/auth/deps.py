@@ -39,7 +39,6 @@ async def get_token_service_data():
     }
 
 
-
 response_data = {
     'login': {
         'path': '/login',
@@ -55,6 +54,5 @@ response_data = {
         'status_code': status.HTTP_201_CREATED,
         'response_model': TokenSchema
     },
-    
-
+   
 }

@@ -83,6 +83,7 @@ class ProfileRepositories(ProfileRepositoriesInterface):
         return {'detail': f'User {user_id} updated'}
 
     async def delete_user(self, user_id: int):
-        stmt = delete(Users).where(Users.id == user_id)
+        
+        stmt = update(Users).where(Users.id == user_id).values(is_active=False)
         _ = await self.session.execute(statement=stmt)
         await self.session.commit()

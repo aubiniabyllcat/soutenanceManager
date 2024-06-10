@@ -2,13 +2,6 @@ from typing import Annotated
 from urllib import response
 from fastapi import APIRouter, Depends, Request
 from fastapi.security import OAuth2PasswordRequestForm
-from requests import session
-
-from database import get_db_session
-
-from users.auth.password_service import PasswordService
-from users.auth.repositories import UserRepositories
-from users.auth.token_service import TokenService
 from .schemas import CreateLoginSchema, CreateUserSchema, BaseUserAccountSchema
 from .presenter import UserPresenter, TokenPresenter
 from .deps import get_option_presenter, response_data, get_token_service_data
@@ -24,7 +17,6 @@ async def sign_up(
 ):
     return await UserPresenter(**option_presenter) \
         .sign_up(**users_data.dict())
-
 
 
 
@@ -50,4 +42,3 @@ async def get_token(
 ):
     return await TokenPresenter(**token_data) \
         .get_token(username=username.username)
-
