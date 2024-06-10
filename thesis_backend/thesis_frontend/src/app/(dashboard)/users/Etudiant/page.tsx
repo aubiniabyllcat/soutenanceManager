@@ -10,6 +10,7 @@ function classNames(...classes: string[]) {
 
 export default function Example() {
   const [agreed, setAgreed] = useState(false)
+  
 
   return (
         <DefaultLayout>

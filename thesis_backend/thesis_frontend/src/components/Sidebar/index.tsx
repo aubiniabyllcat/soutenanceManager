@@ -60,6 +60,10 @@ const links: { group: string; links: SidebarLink[] }[] = [
             label: 'Enseignant',
             href: '/users/Enseignant',
           },
+          {
+            label: 'Listes',
+            href: '/users/Liste',
+          },
         ],
       },
       { label: 'Calendar', icon: Calendar, href: '/calendar' },

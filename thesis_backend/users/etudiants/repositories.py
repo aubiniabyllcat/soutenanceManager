@@ -25,14 +25,16 @@ class EtudiantRepositories(EtudiantRepositoriesInterface):
     
     async def create_etudiant(self, etudiant_data: CreateEtudiantSchema):
         values = {
-    
-            'slug': etudiant_data.matricule,
-            **etudiant_data.dict(exclude_none=True)
+            'matricule': etudiant_data['matricule'],
+            'slug': etudiant_data['matricule'],
+            'filiere_id': etudiant_data['filiere_id'],
+            'annee_id': etudiant_data['annee_id'],
+            'utilisateur_id': etudiant_data['utilisateur_id']
         }
         stmt = insert(Etudiant).values(**values).returning(Etudiant)
         result = await self.session.execute(statement=stmt)
         await self.session.commit()
-        return result.scalar_one()
+        return {'detail': f'Etudiant avec le matricule {etudiant_data["matricule"]} créé avec succès'}
     
     async def delete_etudiant(self, etudiant_slug: str):
         # Récupérer l'étudiant à supprimer
@@ -47,12 +49,12 @@ class EtudiantRepositories(EtudiantRepositoriesInterface):
         stmt = update(Users).where(Users.id == utilisateur_id).values(is_active=False)
         await self.session.execute(stmt)
 
-        # Supprimer l'étudiant
-        stmt = delete(Etudiant).where(Etudiant.slug == etudiant_slug)
+        # # Supprimer l'étudiant
+        # stmt = delete(Etudiant).where(Etudiant.slug == etudiant_slug)
         result = await self.session.execute(statement=stmt)
         await self.session.commit()
-        return result.rowcount
-
+        return {'detail': f'Etudiant avec le matricule {etudiant_slug} supprimé avec succès'}
+    
     async def update_etudiant(self, etudiant_slug: str, updated_data: UpdateEtudiantSchema):
         await self.__check_etudiant(etudiant_slug=etudiant_slug)
         values = {**updated_data.dict(exclude_none=True)}
@@ -61,8 +63,9 @@ class EtudiantRepositories(EtudiantRepositoriesInterface):
             stmt = update(Etudiant).where(Etudiant.slug == etudiant_slug).values(**values).returning(Etudiant)
             result = await self.session.execute(statement=stmt)
         await self.session.commit()
-        return result.scalar_one()
-
+        # return result.scalar_one()
+        return {'detail': f'Etudiant avec le matricule {etudiant_slug} mise à jour'}
+    
     async def get_etudiant(self, etudiant_slug: str):
         stmt = select(Etudiant).where(Etudiant.slug == etudiant_slug)
         result: AsyncResult = await self.session.execute(statement=stmt)

@@ -1,12 +1,15 @@
 from typing import List
 from fastapi import status, Depends
 from permissions import UserPermission
+from users.auth.password_service import PasswordService
+from users.auth.repositories import UserRepositories
 from users.auth.token_service import TokenService
 from .schemas import EtudiantSchema, CreateEtudiantSchema, UpdateEtudiantSchema
 from .repositories import EtudiantRepositories
-
+from sqlalchemy.ext.asyncio import AsyncSession
 from .presenter import EtudiantPresenter
 from database import get_db_session
+from passlib.context import CryptContext
 
 
 # async def get_repository_service(session=Depends(get_db_session)):
@@ -15,9 +18,17 @@ from database import get_db_session
 #     }
 
 
-async def get_presenter(session=Depends(get_db_session)):
+async def get_presenter(
+    session: AsyncSession = Depends(get_db_session)
+):
+    user_repository = UserRepositories(session=session)
+    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+    password_service = PasswordService(context=pwd_context)
     presenter = EtudiantPresenter(
-        repository=EtudiantRepositories(session=session))
+        repository=EtudiantRepositories(session=session),
+        user_repository=user_repository,
+        password_service=password_service
+    )
     yield presenter
 
 

@@ -1,11 +1,15 @@
+from typing import List
 from fastapi import status, Depends
 from permissions import UserPermission
+from users.auth.password_service import PasswordService
+from users.auth.repositories import UserRepositories
 from users.auth.token_service import TokenService
 from .schemas import EnseignantSchema, CreateEnseignantSchema, UpdateEnseignantSchema
 from .repositories import EnseignantRepositories
-
+from sqlalchemy.ext.asyncio import AsyncSession
 from .presenter import EnseignantPresenter
 from database import get_db_session
+from passlib.context import CryptContext
 
 
 # async def get_repository_service(session=Depends(get_db_session)):
@@ -14,9 +18,17 @@ from database import get_db_session
 #     }
 
 
-async def get_presenter(session=Depends(get_db_session)):
+async def get_presenter(
+    session: AsyncSession = Depends(get_db_session)
+):
+    user_repository = UserRepositories(session=session)
+    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+    password_service = PasswordService(context=pwd_context)
     presenter = EnseignantPresenter(
-        repository=EnseignantRepositories(session=session))
+        repository=EnseignantRepositories(session=session),
+        user_repository=user_repository,
+        password_service=password_service
+    )
     yield presenter
 
 
@@ -69,5 +81,10 @@ response_data = {
         'path': '/{matricule}',
         'status_code': status.HTTP_200_OK,
         'response_model': EnseignantSchema
+    },
+    
+    'enseignants_by_departement': {
+        'path': '/by-departement/{departement_id}',
+        'response_model': List[EnseignantSchema],
     },
 }

@@ -26,3 +26,7 @@ class AuthExceptions:
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail='Accès non autorisé'
     )
+    user_not_found= HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail='Utilisateur non trouvé'
+    )

@@ -8,3 +8,5 @@ class UserRepositoriesInterface(ABC):
 
     @abstractmethod
     async def receive_user_by_username(self, username: str): pass
+
+   

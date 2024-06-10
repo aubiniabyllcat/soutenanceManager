@@ -5,11 +5,15 @@ from users.profile.schemas import UserSchema
 
 
 class CreateEnseignantSchema(BaseModel):
-    matricule: str = Field(max_length=200)
+    username: str
+    password: str
+    nom: str
+    prenoms: str
+    matricule: str
     grade: str
     specialite: str
     departement_id: int 
-    utilisateur_id: int
+    
     
 
 
@@ -22,9 +26,13 @@ class UpdateEnseignantSchema(BaseModel):
     def is_empty(self): return not self.dict(exclude_none=True)
 
 
-class EnseignantSchema(CreateEnseignantSchema):
+class EnseignantSchema(BaseModel):
     id: int
     slug: str | None
+    matricule: str
+    grade: str
+    specialite: str
+    departement_id: int
     created: datetime
 
 

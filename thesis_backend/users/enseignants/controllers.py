@@ -48,14 +48,14 @@ async def get_enseignant(
 ):
     return await presenter.get_enseignant(enseignant_slug=matricule)
 
-# @enseignant_controllers.get(**response_data.get('enseignants_by_departement'))
-# async def get_enseignants_by_departement(
-#         departement_id: int,
-#         limit: int | None = 20,
-#         offset: int | None = 0,
-#         presenter: EnseignantPresenter = Depends(get_presenter),
-# ):
-#     data: dict = await get_limit_offset_user(limit, offset)
-#     data['departement_id'] = departement_id
-#     return await presenter.get_enseignants_by_departement(**data)
+@enseignant_controllers.get(**response_data.get('enseignants_by_departement'))
+async def get_enseignants_by_departement(
+        departement_id: int,
+        limit: int | None = 20,
+        offset: int | None = 0,
+        presenter: EnseignantPresenter = Depends(get_presenter),
+):
+    data: dict = await get_limit_offset_user(limit, offset)
+    data['departement_id'] = departement_id
+    return await presenter.get_enseignants_by_departement(**data)
 

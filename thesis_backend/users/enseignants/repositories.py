@@ -24,14 +24,17 @@ class EnseignantRepositories(EnseignantRepositoriesInterface):
     
     async def create_enseignant(self, enseignant_data: CreateEnseignantSchema):
         values = {
-    
-            'slug': enseignant_data.matricule,
-            **enseignant_data.dict(exclude_none=True)
+            'matricule': enseignant_data['matricule'],
+            'slug': enseignant_data['matricule'],
+            'grade': enseignant_data['grade'],
+            'specialite': enseignant_data['specialite'],
+            'departement_id': enseignant_data['departement_id'],
+            'utilisateur_id': enseignant_data['utilisateur_id']
         }
         stmt = insert(Enseignant).values(**values).returning(Enseignant)
         result = await self.session.execute(statement=stmt)
         await self.session.commit()
-        return result.scalar_one()
+        return {'detail': f'Enseignant avec le matricule {enseignant_data["matricule"]} créé avec succès'}
     
     async def delete_enseignant(self, enseignant_slug: str):
         
@@ -47,10 +50,11 @@ class EnseignantRepositories(EnseignantRepositoriesInterface):
         await self.session.execute(stmt)
 
         # Supprimer l'étudiant
-        stmt = delete(Enseignant).where(Enseignant.slug == enseignant_slug)
+        # stmt = delete(Enseignant).where(Enseignant.slug == enseignant_slug)
         result = await self.session.execute(statement=stmt)
         await self.session.commit()
-        return result.rowcount
+        # return result.rowcount
+        return {'detail': f'Enseignant avec le matricule {enseignant_slug} supprimé avec succès'}
 
     async def update_enseignant(self, enseignant_slug: str, updated_data: UpdateEnseignantSchema):
         await self.__check_enseignant(enseignant_slug=enseignant_slug)
@@ -60,7 +64,7 @@ class EnseignantRepositories(EnseignantRepositoriesInterface):
             stmt = update(Enseignant).where(Enseignant.slug == enseignant_slug).values(**values).returning(Enseignant)
             result = await self.session.execute(statement=stmt)
         await self.session.commit()
-        return result.scalar_one()
+        return {'detail': f'Enseignant avec le matricule {enseignant_slug} mise à jour'}
     
     async def get_enseignant(self, enseignant_slug: str):
         stmt = select(Enseignant).where(Enseignant.slug == enseignant_slug)
@@ -76,3 +80,5 @@ class EnseignantRepositories(EnseignantRepositoriesInterface):
         stmt = select(Enseignant).filter(Enseignant.departement_id == departement_id).offset(offset).limit(limit)
         result = await self.session.execute(stmt)
         return result.scalars().all()
+    
+    
