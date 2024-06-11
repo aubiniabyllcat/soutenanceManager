@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, AsyncResult
 from sqlalchemy import select, insert, delete, update
 from sqlalchemy.orm import subqueryload
 from database import Base
-from users.auth.models import Etudiant, Users
+from users.auth.models import Etudiant, Filiere, Users
 from .schemas import CreateEtudiantSchema, EtudiantSchema, UpdateEtudiantSchema
 from .exceptions import EtudiantExceptions
 from .interfaces.repositories_interface import EtudiantRepositoriesInterface
@@ -79,4 +79,16 @@ class EtudiantRepositories(EtudiantRepositoriesInterface):
     async def get_etudiants_by_filiere(self, filiere_id: int, limit: int, offset: int):
         stmt = select(Etudiant).filter(Etudiant.filiere_id == filiere_id).offset(offset).limit(limit)
         result = await self.session.execute(stmt)
+        return result.scalars().all()
+    
+    
+    async def get_filieres(self, limit: int, offset: int):
+        stmt = select(Filiere) \
+            .limit(limit) \
+            .offset(offset)
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
+
+    async def get_filieres(self):
+        result = await self.session.execute(select(Filiere))
         return result.scalars().all()

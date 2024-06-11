@@ -1,7 +1,7 @@
 from typing import List
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from .presenter import EtudiantPresenter
-from .schemas import CreateEtudiantSchema, EtudiantSchema, UpdateEtudiantSchema
+from .schemas import CreateEtudiantSchema, EtudiantSchema, FiliereSchema, UpdateEtudiantSchema
 from .deps import response_data,  get_presenter, \
     get_slug_user, get_updated_data_slug_user, get_limit_offset_user, \
     get_create_data_user
@@ -59,3 +59,12 @@ async def get_etudiants_by_filiere(
     data: dict = await get_limit_offset_user(limit, offset)
     data['filiere_id'] = filiere_id
     return await presenter.get_etudiants_by_filiere(**data)
+
+
+@etudiant_controllers.get('/get_filieres/', response_model=List[FiliereSchema])
+async def get_filieres(presenter: EtudiantPresenter = Depends(get_presenter)):
+    try:
+        return await presenter.get_filieres()
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+

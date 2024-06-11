@@ -47,7 +47,9 @@ const Login = () => {
         setError(`Échec de la connexion : ${response.statusText}`);
       }
     } catch (error) {
-      setError(`Une erreur est survenue lors de la connexion : ${error.message}`);
+      setError(
+        `Une erreur est survenue lors de la connexion : ${error.message}`
+      );
     }
   };
 
@@ -150,12 +152,17 @@ const Login = () => {
               </form>
             </div>
             <div className="md:h-full w-full max-md:mt-10 bg-white rounded-xl lg:p-12 p-8">
-              <Image src="/images/Login/imgLogin.png" alt="nothing" width={1000} height={1} />
+              <Image
+                src="/images/Login/imgLogin.png"
+                alt="nothing"
+                width={1000}
+                height={1}
+              />
             </div>
           </div>
         </div>
       </div>
     </>
-  )
+  );
 };
 export default Login;

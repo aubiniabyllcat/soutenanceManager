@@ -19,3 +19,11 @@ class EnseignantExceptions:
     def empty_data(self):
         return HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail='Empty dict')
+    
+    @property
+    def enseignant_create(self):
+        return HTTPException (
+        status_code=status.HTTP_201_CREATED,
+        detail='Enseignant créé avec succès'
+    )
+    

@@ -8,7 +8,7 @@ from users.enseignants.controllers import enseignant_controllers
 import uvicorn
 from settings import get_settings
 
-app = FastAPI(title='chat', version='1.0.0')
+app = FastAPI(title='soutenance', version='1.0.0')
 
 # Liste des origines autorisées pour CORS
 origins = [

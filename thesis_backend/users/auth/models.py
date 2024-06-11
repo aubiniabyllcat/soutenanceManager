@@ -81,38 +81,6 @@ class Etudiant(Base):
     def __repr__(self) -> str:
         return f'Etudiant: {self.slug}'
     
-
-class Equipe(Base):
-    __tablename__ = 'equipe'
-   
-    id = Column(Integer, primary_key=True)
-    nom = Column(String(150))
-    filiere_id = Column(ForeignKey('filiere.id', ondelete='CASCADE'))
-    maitre_memoire_id = Column(ForeignKey('maitre_memoire.id', ondelete='CASCADE'))
-
-    filiere = relationship('Filiere', backref='equipe')
-    maitre_memoire = relationship('MaitreMemoire', backref='equipe')
-
-    def __repr__(self) -> str:
-        return f'Equipe: {self.nom}'
-
-
-class MembresEquipe(Base):
-    __tablename__ = 'membre_equipe'
-    
-    id = Column(Integer, primary_key=True)
-    equipe_id = Column(ForeignKey('equipe.id', ondelete='CASCADE'))
-    etudiant1_id = Column(ForeignKey('etudiant.id', ondelete='CASCADE'))
-    etudiant2_id = Column(ForeignKey('etudiant.id', ondelete='CASCADE'), nullable=True)
-    
-    equipe = relationship('Equipe', backref='membre_equipe')
-    etudiant1 = relationship('Etudiant', foreign_keys=[etudiant1_id], backref='membre_equipe1')
-    etudiant2 = relationship('Etudiant', foreign_keys=[etudiant2_id], backref='membre_equipe2')
-
-    def __repr__(self) -> str:
-        return f'MembresEquipe: {self.id}'
-
-
     
 class Filiere(Base):
     __tablename__ = 'filiere'
@@ -126,9 +94,6 @@ class Filiere(Base):
         return f'Filiere : {self.nom}'
     
 
-
-
-
 class Annee(Base):
     __tablename__ = 'annee'
 
@@ -139,52 +104,14 @@ class Annee(Base):
         return f'Annee : {self.libelle}'
     
 
-class Equipe(Base):
-    __tablename__ = 'equipe'
-   
-    id = Column(Integer, primary_key=True)
-    nom = Column(String(150))
-    filiere_id = Column(ForeignKey('filiere.id', ondelete='CASCADE'))
-    maitre_memoire_id = Column(ForeignKey('maitre_memoire.id', ondelete='CASCADE'))
-
-    filiere = relationship('Filiere', backref='equipe')
-    maitre_memoire = relationship('MaitreMemoire', backref='equipe')
-
-    def __repr__(self) -> str:
-        return f'Equipe: {self.nom}'
-
-
-class MembresEquipe(Base):
-    __tablename__ = 'membre_equipe'
-    
-    id = Column(Integer, primary_key=True)
-    equipe_id = Column(ForeignKey('equipe.id', ondelete='CASCADE'))
-    etudiant1_id = Column(ForeignKey('etudiant.id', ondelete='CASCADE'))
-    etudiant2_id = Column(ForeignKey('etudiant.id', ondelete='CASCADE'), nullable=True)
-    
-    equipe = relationship('Equipe', backref='membre_equipe')
-    etudiant1 = relationship('Etudiant', foreign_keys=[etudiant1_id], backref='membre_equipe1')
-    etudiant2 = relationship('Etudiant', foreign_keys=[etudiant2_id], backref='membre_equipe2')
-
-    def __repr__(self) -> str:
-        return f'MembresEquipe: {self.id}'
-
-
-
-class Memoire(Base):
-    __tablename__ = 'memoire'
+class Salle(Base):
+    __tablename__ = 'salle'
 
     id = Column(Integer, primary_key=True)
-    theme = Column(String(255), nullable=False)
-    document = Column(String, nullable=False)
-    valide = Column(Boolean, default=False)
-    equipe_id = Column(ForeignKey('equipe.id', ondelete='CASCADE'), unique=True)
-
-    equipe = relationship('Equipe', backref='memoire')
+    libelle = Column(String(length=200), nullable=False)
 
     def __repr__(self) -> str:
-        return f'Memoire: {self.theme}'
-
+        return f'Salle : {self.libelle}'
 
 
 
@@ -222,24 +149,62 @@ class Chefdepartement(Base):
 
     id = Column(Integer, primary_key=True)
     enseignant_id = Column(Integer, ForeignKey('enseignant.id', ondelete='CASCADE'))
-    departement_id = Column(Integer, ForeignKey('departement.id', ondelete='CASCADE'))
+    annee_id = Column(Integer, ForeignKey('annee.id', ondelete='CASCADE'))
     
     enseignant_rel = relationship('Enseignant', backref='chef_departement')
-    chef_departemnt_rel = relationship('Departement', backref='chef_departement')
-    def __repr__(self) -> str:
-        return f'Filiere : {self.id}'
+    annee_rel = relationship('Annee', backref='chef_departement')
 
-class MaitreMemoire(Base):
-    __tablename__ = 'maitre_memoire'
+    def __repr__(self) -> str:
+        return f'Chefdepartement : {self.id}'
+
+class Jury(Base):
+    __tablename__ = 'jury'
+    __table_args__ = {'schema': 'public'}
+
+    id = Column(Integer, primary_key=True)
+    president_id = Column(Integer, ForeignKey('enseignant.id', ondelete='CASCADE'))
+    examinateur_id = Column(Integer, ForeignKey('enseignant.id', ondelete='CASCADE'))
+    rapporteur_id = Column(Integer, ForeignKey('enseignant.id', ondelete='CASCADE'), nullable=True)
+
+    president = relationship('Enseignant', foreign_keys=[president_id], backref='membre_jury1')
+    examinateur = relationship('Enseignant', foreign_keys=[examinateur_id], backref='membre_jury2')
+    rapporteur = relationship('Enseignant', foreign_keys=[rapporteur_id], backref='membre_jury3')
+
+    def __repr__(self) -> str:
+        return f'Jury : {self.id}'
+
+
+class Soutenance(Base):
+    __tablename__ = 'soutenance'
     __mapper_args__ = {'eager_defaults': True}
 
     id = Column(Integer, primary_key=True)
-    nbr_max_equipe = Column(Integer, nullable=False)
-    filiere_id = Column(ForeignKey('filiere.id', ondelete='CASCADE'))
-    enseignant_id = Column(ForeignKey('enseignant.id', ondelete='CASCADE'))
+    theme = Column(String(length=200), nullable=True)
+    is_theme_valide = Column(Boolean, default=False)
+    fichier = Column(String(length=200), nullable=True)
+    lieu_stage = Column(String(length=200), nullable=True) 
+    enseignant_id = Column(Integer,  ForeignKey('enseignant.id', ondelete='CASCADE'))
+    
+    enseignant_rel = relationship('Enseignant', backref='soutenance')
+    created = Column(DateTime, server_default=func.now())
+    update_at = Column(String(length=200), nullable=True)
+    
+    def __repr__(self) -> str:
+        return f'Soutenance: {self.theme}'
+    
 
-    enseignant = relationship('Enseignant', backref='maitre_memoire')
-    filiere = relationship('Filiere', backref='maitre_memoire')
+    
+class Appartenir(Base):
+    __tablename__ = 'appartenir'
+    __mapper_args__ = {'eager_defaults': True}
+
+    id = Column(Integer, primary_key=True)
+    etudiant_id = Column(Integer, ForeignKey('etudiant.id', ondelete='CASCADE'))
+    soutenance_id = Column(Integer, ForeignKey('soutenance.id', ondelete='CASCADE'))
+
+    etudiant_rel = relationship('Etudiant', backref='appartenir')
+    soutenance_rel = relationship('Soutenance', backref='appartenir')
 
     def __repr__(self) -> str:
-        return f'MaitreMemoire: {self.id}'
+        return f'Appartenir: {self.id}'
+

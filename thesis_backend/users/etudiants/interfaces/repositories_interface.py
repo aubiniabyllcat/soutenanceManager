@@ -9,6 +9,10 @@ class EtudiantRepositoriesInterface(ABC):
         pass
 
     @abstractmethod
+    async def get_filieres(self, limit: int, offset: int):
+        pass
+
+    @abstractmethod
     async def create_etudiant(
             self, etudiant_data: CreateEtudiantSchema):
         pass

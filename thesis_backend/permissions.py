@@ -14,9 +14,9 @@ from users.auth.models import Users
 
 
 class PermissionException:
-    email_not_found = HTTPException(
+    username_not_found = HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail='email not found'
+        detail='username not found'
     )
     user_not_found = HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
@@ -33,10 +33,10 @@ class UserPermission:
 
     async def receive_user(self, token: str, db: AsyncSession):
         payload: dict = await self.token_service.decode_token(token=token)
-        if not (email := payload.get('sub')):
-            raise PermissionException().email_not_found
+        if not (username := payload.get('sub')):
+            raise PermissionException().username_not_found
         stmt = select(Users) \
-            .where(Users.email == email, Users.is_active)
+            .where(Users.username == username, Users.is_active)
         result: AsyncResult = await db.execute(statement=stmt)
         if not (user := result.scalars().first()):
             raise PermissionException().user_not_found

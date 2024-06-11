@@ -4,7 +4,7 @@ from permissions import UserPermission
 from users.auth.password_service import PasswordService
 from users.auth.repositories import UserRepositories
 from users.auth.token_service import TokenService
-from .schemas import EtudiantSchema, CreateEtudiantSchema, UpdateEtudiantSchema
+from .schemas import EtudiantSchema, CreateEtudiantSchema, FiliereSchema, UpdateEtudiantSchema
 from .repositories import EtudiantRepositories
 from sqlalchemy.ext.asyncio import AsyncSession
 from .presenter import EtudiantPresenter
@@ -85,5 +85,9 @@ response_data = {
     'etudiants_by_filiere': {
         'path': '/by-filiere/{filiere_id}',
         'response_model': List[EtudiantSchema],
+    },
+    'get_filieres': {
+        'path': '/get_filieres/',
+        'response_model': List[FiliereSchema]
     },
 }
