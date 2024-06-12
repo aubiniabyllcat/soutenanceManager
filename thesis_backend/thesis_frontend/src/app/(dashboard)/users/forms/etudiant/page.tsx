@@ -4,16 +4,12 @@ import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { Field, Label, Switch } from '@headlessui/react'
 import DefaultLayout from '@/components/Layouts/DefaultLayout'
 
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(' ')
-}
 
-export default function Example() {
-  const [agreed, setAgreed] = useState(false)
+const AddEtudiant = () => {
   
 
   return (
-        <DefaultLayout>
+ <DefaultLayout>
 
    <div className="flex flex-col gap-9">
   <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -161,7 +157,8 @@ Mot de passe            </label>
   </div>
 </div>
 
-            </DefaultLayout>
+</DefaultLayout>
 
   )
-}
+};
+export default AddEtudiant;

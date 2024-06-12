@@ -1,4 +1,4 @@
-import '@/app/globals.css';
+import './landingpage-style.css';
 import Navbar from '@/components/landing-page/Navbar/index';
 import Footer from '@/components/landing-page/Footer/Footer';
 

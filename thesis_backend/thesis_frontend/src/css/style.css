@@ -1,45 +1,42 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 @layer base {
     body {
         @apply relative z-1 bg-whiten font-satoshi text-base font-normal text-body;
     }
 }
 
-@layer components {
-}
+@layer components {}
 
 @layer utilities {
     /* Chrome, Safari and Opera */
     .no-scrollbar::-webkit-scrollbar {
         display: none;
     }
-
     .no-scrollbar {
-        -ms-overflow-style: none; /* IE and Edge */
-        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none;
+        /* IE and Edge */
+        scrollbar-width: none;
+        /* Firefox */
     }
-
     .chat-height {
-        @apply h-[calc(100vh_-_8.125rem)] lg:h-[calc(100vh_-_5.625rem)];
+        @apply h-[calc(100vh_-_8.125rem)] lg: h-[calc(100vh_-_5.625rem)];
     }
-
     .inbox-height {
-        @apply h-[calc(100vh_-_8.125rem)] lg:h-[calc(100vh_-_5.625rem)];
+        @apply h-[calc(100vh_-_8.125rem)] lg: h-[calc(100vh_-_5.625rem)];
     }
 }
+
 
 /* third-party libraries CSS */
 
-.tableCheckbox:checked ~ div span {
+.tableCheckbox:checked~div span {
     @apply opacity-100;
 }
 
-.tableCheckbox:checked ~ div {
+.tableCheckbox:checked~div {
     @apply border-primary bg-primary;
 }
 
@@ -190,9 +187,9 @@ span.flatpickr-weekday,
     @apply !border-primary !bg-primary hover:!border-primary hover:!bg-primary;
 }
 
-.flatpickr-day.selected.startRange + .endRange:not(:nth-child(7n + 1)),
-.flatpickr-day.startRange.startRange + .endRange:not(:nth-child(7n + 1)),
-.flatpickr-day.endRange.startRange + .endRange:not(:nth-child(7n + 1)) {
+.flatpickr-day.selected.startRange+.endRange:not(:nth-child(7n + 1)),
+.flatpickr-day.startRange.startRange+.endRange:not(:nth-child(7n + 1)),
+.flatpickr-day.endRange.startRange+.endRange:not(:nth-child(7n + 1)) {
     box-shadow: -10px 0 0 #3c50e0;
 }
 
@@ -212,15 +209,15 @@ span.flatpickr-weekday,
     @apply !right-0;
 }
 
-.taskCheckbox:checked ~ .box span {
+.taskCheckbox:checked~.box span {
     @apply opacity-100;
 }
 
-.taskCheckbox:checked ~ p {
+.taskCheckbox:checked~p {
     @apply line-through;
 }
 
-.taskCheckbox:checked ~ .box {
+.taskCheckbox:checked~.box {
     @apply border-primary bg-primary dark:border-primary;
 }
 
