@@ -21,7 +21,7 @@ class UserRepositories(UserRepositoriesInterface):
             role_id=role_id
         ).returning(Users.id)
         result = await self.session.execute(statement=stmt)
-        #await self.session.commit()
+        await self.session.commit()
         utilisateur_id = result.scalar_one()
         return utilisateur_id
 

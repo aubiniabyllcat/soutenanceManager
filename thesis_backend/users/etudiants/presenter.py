@@ -65,7 +65,7 @@ class EtudiantPresenter:
             except SQLAlchemyError as e:
                 print("Il y a eu une erreur:", e)
                 # Annuler la transaction en cas d'erreur
-                # await session.rollback()
+                await session.rollback()
                 #self.user_repository.delete_user(13)
                 raise e
             
