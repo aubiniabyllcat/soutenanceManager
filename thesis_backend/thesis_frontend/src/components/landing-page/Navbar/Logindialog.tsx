@@ -1,23 +1,34 @@
 "use client";
 
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { X } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 const Login = () => {
+  const router = useRouter();
+  localStorage.setItem("isload", "0");
+  const session = localStorage.getItem("sessionIsActive");
+
+  const [treatment, setTreatement] = useState(false);
+  const [message, setMessage] = useState("");
+  const [styleMessage, setStyleMessage] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const router = useRouter();
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setTreatement(true);
+    setStyleMessage("text-success mb-3");
+    setMessage("Traitement...");
 
     if (!username || !password) {
-      setError("Veuillez entrer un nom d'utilisateur et un mot de passe.");
+      setStyleMessage("alert alert-danger text-dark");
+      setMessage("Les champs sont obligatoires !!!");
       return;
     }
 
@@ -34,6 +45,8 @@ const Login = () => {
       });
 
       const responseData = await response.json();
+      console.log(responseData);
+      
 
       if (response.ok) {
         localStorage.setItem("accessToken", responseData.access_token);
@@ -42,14 +55,27 @@ const Login = () => {
           "userInfo",
           JSON.stringify(responseData.user_info)
         );
+        
+        localStorage.setItem("sessionIsActive", "1");
+        console.log(localStorage);
+        
         router.push("/dashboard");
       } else {
-        setError(`Échec de la connexion : ${response.statusText}`);
+        const errorData = await response.json();
+        setError(`Échec de la connexion : ${errorData.message || response.status}`);
       }
     } catch (error) {
-      setError(`Une erreur est survenue lors de la connexion : ${error.message}`);
+          setStyleMessage("alert alert-danger text-dark");
+          setMessage("Ces identifiants n'existent pas");
     }
   };
+
+  useEffect(() => {
+    if (session === "1") {
+      router.push('/dashboard');
+    }
+  }, [session, router]);
+  
 
   return (
     <>
@@ -61,11 +87,15 @@ const Login = () => {
                 <div className="mb-12">
                   <h3 className="text-3xl font-extrabold">Connexion </h3>
                 </div>
-                {error && (
-                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                    <span className="block sm:inline">{error}</span>
-                  </div>
-                )}
+                {treatment ? (
+                    <div className={"text-center " + styleMessage}>
+                      {" "}
+                      {message}{" "}
+                    </div>
+                  ) : (
+                    ""
+                  )}
+                  {error && <p>{error}</p>}
                 <div>
                   <label className="text-xs block mb-2">Login</label>
                   <div className="relative flex items-center">
@@ -150,12 +180,19 @@ const Login = () => {
               </form>
             </div>
             <div className="md:h-full w-full max-md:mt-10 bg-white rounded-xl lg:p-12 p-8">
-              <Image src="/images/Login/imgLogin.png" alt="nothing" width={1000} height={1} />
+              <Image
+                src="/images/Login/imgLogin.png"
+                alt="nothing"
+                width={1000}
+                height={1}
+              />
             </div>
           </div>
         </div>
       </div>
+      
+
     </>
-  )
-};
+  );
+}  
 export default Login;

@@ -30,3 +30,7 @@ class AuthExceptions:
         status_code=status.HTTP_404_NOT_FOUND,
         detail='Utilisateur non trouvé'
     )
+    user_create= HTTPException(
+        status_code=status.HTTP_201_CREATED,
+        detail='Utilisateur créé avec succès'
+    )

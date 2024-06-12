@@ -4,7 +4,8 @@ from permissions import UserPermission
 from users.auth.password_service import PasswordService
 from users.auth.repositories import UserRepositories
 from users.auth.token_service import TokenService
-from .schemas import EnseignantSchema, CreateEnseignantSchema, UpdateEnseignantSchema
+from users.etudiants.schemas import FiliereSchema
+from .schemas import DepartementSchema, EnseignantSchema, CreateEnseignantSchema, UpdateEnseignantSchema
 from .repositories import EnseignantRepositories
 from sqlalchemy.ext.asyncio import AsyncSession
 from .presenter import EnseignantPresenter
@@ -86,5 +87,13 @@ response_data = {
     'enseignants_by_departement': {
         'path': '/by-departement/{departement_id}',
         'response_model': List[EnseignantSchema],
+    },
+    'get_departements': {
+        'path': '/get_departements/',
+        'response_model': List[DepartementSchema]
+    },
+    'filieres_by_departement': {
+        'path': '/departements/{departement_id}/filieres',
+        'response_model': List[FiliereSchema],
     },
 }

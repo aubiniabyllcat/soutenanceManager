@@ -33,5 +33,10 @@ class EtudiantSchema(BaseModel):
     class Config:
         orm_mode = True
 
+class FiliereSchema(BaseModel):
+    id: int
+    nom: str
+    departement_id: int
 
-
+    class Config:
+            orm_mode = True

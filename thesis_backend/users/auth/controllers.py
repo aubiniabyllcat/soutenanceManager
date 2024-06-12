@@ -42,3 +42,16 @@ async def get_token(
 ):
     return await TokenPresenter(**token_data) \
         .get_token(username=username.username)
+
+@auth_controllers.delete(**response_data.get('delete_user'))
+async def delete_user(
+        utilisateur_id : int,
+        option_presenter=Depends(get_option_presenter)
+      
+):
+    return await UserPresenter(**option_presenter) \
+        .delete_user(utilisateur_id=utilisateur_id)
+
+# @auth_controllers.post('/logout')
+# async def logout(token: str = Depends(oauth2_scheme), option_presenter=Depends(get_option_presenter)):
+#     return await UserPresenter(**option_presenter).logout(token)

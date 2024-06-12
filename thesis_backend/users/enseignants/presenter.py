@@ -6,7 +6,8 @@ from users.auth.exceptions import AuthExceptions
 from users.auth.interfaces.password_service_interface import PasswordServiceInterface
 from users.auth.interfaces.repositories_interface import UserRepositoriesInterface
 from users.etudiants.exceptions import EtudiantExceptions
-from .schemas import EnseignantSchema, UpdateEnseignantSchema, CreateEnseignantSchema
+from users.etudiants.schemas import FiliereSchema
+from .schemas import DepartementSchema, EnseignantSchema, UpdateEnseignantSchema, CreateEnseignantSchema
 from .interfaces.repositories_interface import EnseignantRepositoriesInterface
 from .exceptions import EnseignantExceptions
 from sqlalchemy.exc import SQLAlchemyError
@@ -22,10 +23,7 @@ class EnseignantPresenter:
         data = { 'limit': limit, 'offset': offset}
         return await self.repository.get_enseignants(**data)
 
-    # async def create_enseignant(self, enseignant_data: CreateEnseignantSchema):
-    #     data = { 'enseignant_data': enseignant_data}
-    #     return await self.repository.create_enseignant(**data)
-    
+   
     async def create_enseignant(self, enseignant_data: CreateEnseignantSchema):
         async with AsyncSessionLocal() as session:
             utilisateur_id = None  # Initialiser utilisateur_id à None
@@ -66,7 +64,7 @@ class EnseignantPresenter:
 
                 # Si tout s'est bien passé, committer la transaction
                 await session.commit()
-
+                raise EnseignantExceptions().enseignant_create
             except SQLAlchemyError as e:
                 print("Il y a eu une erreur:", e)
                 # Annuler la transaction en cas d'erreur
@@ -98,3 +96,16 @@ class EnseignantPresenter:
 
     async def get_enseignants_by_departement(self, departement_id: int, limit: int, offset: int) -> List[EnseignantSchema]:
         return await self.repository.get_enseignants_by_departement(departement_id, limit, offset)
+    
+
+    async def get_departements(self) -> List[DepartementSchema]:
+        departements = await self.repository.get_departements()
+        return [DepartementSchema.from_orm(departement) for departement in departements]
+    
+    async def get_filieres_by_departement(self, departement_id: int):
+        try:
+            filieres = await self.repository.get_filieres_by_departement(departement_id)
+            return [FiliereSchema.from_orm(filiere) for filiere in filieres]
+        except Exception as e:
+            # Gérer les exceptions appropriées ici
+            raise e

@@ -67,7 +67,8 @@ class UserPresenter(CreateTokenMixin):
                 'utilisateur_id': user.id,
                 'nom': user.nom,
                 'prenoms': user.prenoms,
-                'role': user.role_id
+                'role': user.role_id,
+                'admin': user.is_admin
         }
     }
     
@@ -78,3 +79,12 @@ class UserPresenter(CreateTokenMixin):
         _password = await self.password_service \
             .hashed_password(password=password)
         await self.repository.save_user(username=username, password=_password, nom=nom, prenoms=prenoms, role_id=role_id)
+        raise AuthExceptions().user_create
+
+    async def delete_user(self, utilisateur_id: int):
+        return await self.repository.delete_user(utilisateur_id=utilisateur_id)
+
+    
+# async def logout(self, token: str):
+#         await self.repository.deactivate_token(token)
+#         return {"msg": "Successfully logged out"}

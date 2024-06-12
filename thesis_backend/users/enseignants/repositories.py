@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, AsyncResult
 from sqlalchemy import select, insert, delete, update
 from sqlalchemy.orm import subqueryload
 
-from users.auth.models import Enseignant, Users
+from users.auth.models import Departement, Enseignant, Filiere, Users
 from .schemas import CreateEnseignantSchema, UpdateEnseignantSchema
 from .exceptions import EnseignantExceptions
 from .interfaces.repositories_interface import EnseignantRepositoriesInterface
@@ -81,4 +81,11 @@ class EnseignantRepositories(EnseignantRepositoriesInterface):
         result = await self.session.execute(stmt)
         return result.scalars().all()
     
+    async def get_departements(self):
+        result = await self.session.execute(select(Departement))
+        return result.scalars().all()
     
+    async def get_filieres_by_departement(self, departement_id: int):
+        stmt = select(Filiere).filter(Filiere.departement_id == departement_id)
+        result = await self.session.execute(stmt)
+        return result.scalars().all()

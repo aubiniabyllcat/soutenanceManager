@@ -38,3 +38,10 @@ class EnseignantSchema(BaseModel):
 
     class Config:
         orm_mode = True
+
+class DepartementSchema(BaseModel):
+    id: int
+    nom: str 
+    
+    class Config:
+        orm_mode = True

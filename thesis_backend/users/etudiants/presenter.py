@@ -5,7 +5,7 @@ from database import AsyncSessionLocal
 from users.auth.exceptions import AuthExceptions
 from users.auth.interfaces.password_service_interface import PasswordServiceInterface
 from users.auth.interfaces.repositories_interface import UserRepositoriesInterface
-from .schemas import EtudiantSchema, UpdateEtudiantSchema, CreateEtudiantSchema
+from .schemas import EtudiantSchema, FiliereSchema, UpdateEtudiantSchema, CreateEtudiantSchema
 from .interfaces.repositories_interface import EtudiantRepositoriesInterface
 from .exceptions import EtudiantExceptions
 from sqlalchemy.exc import SQLAlchemyError
@@ -22,24 +22,20 @@ class EtudiantPresenter:
         data = { 'limit': limit, 'offset': offset}
         return await self.repository.get_etudiants(**data)
 
-    # async def create_etudiant(self, etudiant_data: CreateEtudiantSchema):
-    #     data = { 'etudiant_data': etudiant_data}
-    #     return await self.repository.create_etudiant(**data)
-
-    async def create_enseignant(self, etudiant_data: CreateEtudiantSchema):
+    async def create_etudiant(self, etudiant_data: CreateEtudiantSchema):
         async with AsyncSessionLocal() as session:
             utilisateur_id = None  # Initialiser utilisateur_id à None
             try:
-                async with session.begin_nested():
+                async with session.begin():
                     # Vérifier si l'utilisateur existe déjà
                     if await self.user_repository.receive_user_by_username(username=etudiant_data.username):
                         raise AuthExceptions().username_exists
-                    
+
                     # Vérifier si le matricule existe déjà
                     existing_etudiant = await self.repository.get_etudiant(etudiant_slug=etudiant_data.matricule)
                     if existing_etudiant:
                         raise EtudiantExceptions().etudiant_exists
-                    
+
                     # Hacher le mot de passe
                     hashed_password = await self.password_service.hashed_password(password=etudiant_data.password)
 
@@ -65,17 +61,15 @@ class EtudiantPresenter:
 
                 # Si tout s'est bien passé, committer la transaction
                 await session.commit()
-
+                raise EtudiantExceptions().etudiant_create
             except SQLAlchemyError as e:
                 print("Il y a eu une erreur:", e)
                 # Annuler la transaction en cas d'erreur
                 await session.rollback()
+                #self.user_repository.delete_user(13)
                 raise e
-            except Exception as e:
-                print("Une erreur inattendue est survenue:", e)
-                # Annuler la transaction en cas d'erreur
-                await session.rollback()
-                raise e
+            
+            
 
     async def delete_etudiant(self, etudiant_slug: str):
         data = { 'etudiant_slug': etudiant_slug}
@@ -97,3 +91,8 @@ class EtudiantPresenter:
 
     async def get_etudiants_by_filiere(self, filiere_id: int, limit: int, offset: int) -> List[EtudiantSchema]:
         return await self.repository.get_etudiants_by_filiere(filiere_id, limit, offset)
+    
+    
+    async def get_filieres(self) -> List[FiliereSchema]:
+        filieres = await self.repository.get_filieres()
+        return [FiliereSchema.from_orm(filiere) for filiere in filieres]
