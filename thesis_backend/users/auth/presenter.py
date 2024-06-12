@@ -67,7 +67,8 @@ class UserPresenter(CreateTokenMixin):
                 'utilisateur_id': user.id,
                 'nom': user.nom,
                 'prenoms': user.prenoms,
-                'role': user.role_id
+                'role': user.role_id,
+                'admin': user.is_admin
         }
     }
     

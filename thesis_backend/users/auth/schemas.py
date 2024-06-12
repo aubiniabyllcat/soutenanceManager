@@ -26,3 +26,4 @@ class UserInfoSchema(BaseModel):
     nom: str
     prenoms: str
     role_id: int
+    is_admin: str

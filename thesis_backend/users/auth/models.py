@@ -23,6 +23,7 @@ class Users(Base):
         ForeignKey('role.id', ondelete='CASCADE')
     )
     is_active = Column(Boolean, default=True)
+    is_admin = Column(Boolean, default=False)
     created = Column(DateTime, server_default=func.now())
 
     role_rel = relationship('Role', backref='utilisateur')
@@ -162,6 +163,7 @@ class Jury(Base):
     __table_args__ = {'schema': 'public'}
 
     id = Column(Integer, primary_key=True)
+    numero = Column(String(length=200), nullable=False, unique=True)
     president_id = Column(Integer, ForeignKey('enseignant.id', ondelete='CASCADE'))
     examinateur_id = Column(Integer, ForeignKey('enseignant.id', ondelete='CASCADE'))
     rapporteur_id = Column(Integer, ForeignKey('enseignant.id', ondelete='CASCADE'), nullable=True)
@@ -171,7 +173,7 @@ class Jury(Base):
     rapporteur = relationship('Enseignant', foreign_keys=[rapporteur_id], backref='membre_jury3')
 
     def __repr__(self) -> str:
-        return f'Jury : {self.id}'
+        return f'Jury : {self.numero}'
 
 
 class Soutenance(Base):

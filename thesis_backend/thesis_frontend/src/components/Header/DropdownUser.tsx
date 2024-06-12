@@ -1,10 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const DropdownUser = () => {
-
+  const router = useRouter();
   const [userInfo, setUserInfo] = useState(null);
+  const handleLogout = () => {
+    localStorage.setItem("sessionIsActive", "0");
+    localStorage.removeItem('userInfo');
+    console.log(localStorage);
+    
+
+    router.push('/login');
+  };
+
+  const info = localStorage.getItem("userInfo");
+  
 
   useEffect(() => {
     const storedUserInfo = localStorage.getItem('userInfo');
@@ -60,9 +72,9 @@ const DropdownUser = () => {
         <span className="hidden text-right lg:block">
       
         <span className="block text-sm font-medium text-black dark:text-white">
-          {userInfo?.nom ?? 'Nom inconnu'} {userInfo?.prenoms ?? 'Prénoms inconnus'}
+        {userInfo?.prenoms ?? 'Prénoms'}                                 {userInfo?.nom ?? 'Nom'} 
         </span>
-        <span className="block text-xs">{userInfo?.roleLabel ?? 'Rôle inconnu'}</span>
+        <span className="block text-xs">{userInfo?.roleLabel ?? 'Rôle'}</span>
 
         </span>
       
@@ -195,7 +207,16 @@ Paramètres du compte            </Link>
               fill=""
             />
           </svg>
-          Se déconnecter
+        
+          
+          <Link 
+                  href="/login"
+                  className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
+                   onClick={handleLogout}
+                >
+                  {" "}
+                  Se déconnecter
+                </Link>
         </button>
       </div>
       {/* <!-- Dropdown End --> */}
