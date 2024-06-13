@@ -72,44 +72,44 @@ const links: { group: string; links: SidebarLink[] }[] = [
   {
     group: 'Autres',
     links: [
-      {
-        label: 'Chart',
-        icon: BarChart2,
-        children: [
-          {
-            label: 'Basic Chart',
-            href: '/chart',
-          },
-        ],
-      },
-      {
-        label: 'Ui Elements',
-        icon: TabletSmartphone,
-        children: [
-          {
-            label: 'Alerts',
-            href: '/ui/alerts',
-          },
-          {
-            label: 'Buttons',
-            href: '/ui/buttons',
-          },
-        ],
-      },
-      {
-        label: 'Formulaires',
-        icon: TableCellsMerge,
-        children: [
-          {
-            label: 'Form Elements',
-            href: '/forms/form-elements',
-          },
-          {
-            label: 'Form Layout',
-            href: '/forms/form-layout',
-          },
-        ],
-      },
+      // {
+      //   label: 'Chart',
+      //   icon: BarChart2,
+      //   children: [
+      //     {
+      //       label: 'Basic Chart',
+      //       href: '/chart',
+      //     },
+      //   ],
+      // },
+      // {
+      //   label: 'Ui Elements',
+      //   icon: TabletSmartphone,
+      //   children: [
+      //     {
+      //       label: 'Alerts',
+      //       href: '/ui/alerts',
+      //     },
+      //     {
+      //       label: 'Buttons',
+      //       href: '/ui/buttons',
+      //     },
+      //   ],
+      // },
+      // {
+      //   label: 'Formulaires',
+      //   icon: TableCellsMerge,
+      //   children: [
+      //     {
+      //       label: 'Form Elements',
+      //       href: '/forms/form-elements',
+      //     },
+      //     {
+      //       label: 'Form Layout',
+      //       href: '/forms/form-layout',
+      //     },
+      //   ],
+      // },
       {
         label: 'Authentication',
         icon: Lock,

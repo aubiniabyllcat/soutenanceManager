@@ -25,11 +25,11 @@ export const columns: ColumnDef<Employee>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "first_name",
+    accessorKey: "nom",
     header: "Nom",
   },
   {
-    accessorKey: "country",
+    accessorKey: "prenoms",
     header: "Prénoms",
   },
   {
@@ -37,11 +37,11 @@ export const columns: ColumnDef<Employee>[] = [
     header: "Email",
   },
   {
-    accessorKey: "job",
+    accessorKey: "filiere",
     header: "Filière",
   },
   {
-    accessorKey: "gender",
+    accessorKey: "annee",
     header: "Année",
   },
   {

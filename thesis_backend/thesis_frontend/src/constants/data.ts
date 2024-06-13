@@ -92,6 +92,16 @@ export const users: User[] = [
   },
 ];
 
+export type Etudiant = {
+  id: number;
+  username: string;
+  nom: string;
+  prenom: string;
+  filiere_id: number;
+  annee_id: number;
+  email: string;
+  biographie: string;
+};
 export type Employee = {
   id: number;
   first_name: string;

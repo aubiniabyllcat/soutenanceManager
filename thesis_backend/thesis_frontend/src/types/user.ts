@@ -17,3 +17,14 @@ export type Employee = {
   job: string;
   profile_picture?: string | null; // Profile picture can be a string (URL) or null (if no picture)
 };
+
+export type Etudiant = {
+  id: number;
+  username: string;
+  nom: string;
+  prenom: string;
+  filiere_id: number;
+  annee_id: number;
+  email: string;
+  biographie: string;
+};

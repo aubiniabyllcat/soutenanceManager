@@ -105,14 +105,8 @@ class Annee(Base):
         return f'Annee : {self.libelle}'
     
 
-<<<<<<< HEAD
-
-class Memoire(Base):
-    __tablename__ = 'memoire'
-=======
 class Salle(Base):
     __tablename__ = 'salle'
->>>>>>> 95b2668561d1e6029986d9c9b87f1256faa18c3e
 
     id = Column(Integer, primary_key=True)
     libelle = Column(String(length=200), nullable=False)
