@@ -23,7 +23,11 @@ const DropdownUser = () => {
     if (storedUserInfo) {
         const parsedUserInfo = JSON.parse(storedUserInfo);
         // Ajouter la logique pour mapper le rôle de l'utilisateur à un libellé approprié
-        parsedUserInfo.roleLabel = parsedUserInfo.role === 1 ? 'Étudiant' : 'Enseignant';
+        parsedUserInfo.roleLabel =  parsedUserInfo.role === 1 
+    ? 'Étudiant' 
+    : parsedUserInfo.role === 2 
+      ? 'Enseignant' 
+      : 'Administrateur';
         setUserInfo(parsedUserInfo);
     }
 }, []);

@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, AsyncResult
 from sqlalchemy import select, insert, delete, update
 from sqlalchemy.orm import subqueryload
 
-from users.auth.models import Departement, Enseignant, Filiere, Users
+from users.auth.models import Departement, Enseignant, Filiere, Grade, Users
 from .schemas import CreateEnseignantSchema, UpdateEnseignantSchema
 from .exceptions import EnseignantExceptions
 from .interfaces.repositories_interface import EnseignantRepositoriesInterface
@@ -26,7 +26,7 @@ class EnseignantRepositories(EnseignantRepositoriesInterface):
         values = {
             'matricule': enseignant_data['matricule'],
             'slug': enseignant_data['matricule'],
-            'grade': enseignant_data['grade'],
+            'grade_id': enseignant_data['grade_id'],
             'specialite': enseignant_data['specialite'],
             'departement_id': enseignant_data['departement_id'],
             'utilisateur_id': enseignant_data['utilisateur_id']
@@ -83,6 +83,10 @@ class EnseignantRepositories(EnseignantRepositoriesInterface):
     
     async def get_departements(self):
         result = await self.session.execute(select(Departement))
+        return result.scalars().all()
+    
+    async def get_grades(self):
+        result = await self.session.execute(select(Grade))
         return result.scalars().all()
     
     async def get_filieres_by_departement(self, departement_id: int):

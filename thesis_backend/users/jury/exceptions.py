@@ -1,18 +1,18 @@
 from fastapi import HTTPException, status
 
 
-class EtudiantExceptions:
+class JuryExceptions:
     @property
-    def etudiant_not_found(self):
+    def jury_not_found(self):
         return HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail='Etudiants non trouvé'
+            detail='Jury non trouvé'
         )
     @property
-    def etudiant_exists(self):
+    def jury_exists(self):
         return HTTPException (
         status_code=status.HTTP_400_BAD_REQUEST,
-        detail='Cet etudiant existe déjà'
+        detail='Ce jury existe déjà'
     )
 
     @property
@@ -21,9 +21,9 @@ class EtudiantExceptions:
             status_code=status.HTTP_400_BAD_REQUEST, detail='Empty dict')
     
     @property
-    def etudiant_create(self):
+    def jury_create(self):
         return HTTPException (
         status_code=status.HTTP_201_CREATED,
-        detail='Etudiant créé avec succès'
+        detail='Jury créé avec succès'
     )
     

@@ -33,7 +33,7 @@ class EtudiantRepositories(EtudiantRepositoriesInterface):
         }
         stmt = insert(Etudiant).values(**values).returning(Etudiant)
         result = await self.session.execute(statement=stmt)
-        #await self.session.commit()
+        await self.session.commit()
         return {'detail': f'Etudiant avec le matricule {etudiant_data["matricule"]} créé avec succès'}
         
     

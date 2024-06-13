@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import List
 
 from database import AsyncSessionLocal
+from users.auth.service_email import send_email
 from users.auth.exceptions import AuthExceptions
 from users.auth.interfaces.password_service_interface import PasswordServiceInterface
 from users.auth.interfaces.repositories_interface import UserRepositoriesInterface
@@ -26,30 +27,31 @@ class EtudiantPresenter:
         async with AsyncSessionLocal() as session:
             utilisateur_id = None  # Initialiser utilisateur_id à None
             try:
-                async with session.begin():
+                async with session.begin_nested():
                     # Vérifier si l'utilisateur existe déjà
                     if await self.user_repository.receive_user_by_username(username=etudiant_data.username):
                         raise AuthExceptions().username_exists
-
+                    
                     # Vérifier si le matricule existe déjà
                     existing_etudiant = await self.repository.get_etudiant(etudiant_slug=etudiant_data.matricule)
                     if existing_etudiant:
                         raise EtudiantExceptions().etudiant_exists
-
+                    
                     # Hacher le mot de passe
                     hashed_password = await self.password_service.hashed_password(password=etudiant_data.password)
 
                     # Enregistrer l'utilisateur et récupérer l'utilisateur_id
                     utilisateur_id = await self.user_repository.save_user(
                         username=etudiant_data.username,
+                        email=etudiant_data.email,
                         password=hashed_password,
                         nom=etudiant_data.nom,
                         prenoms=etudiant_data.prenoms,
-                        role_id=1  # Role ID pour étudiant
+                        role_id=2  # Role ID pour étudiant
                     )
                     print(f"Utilisateur {etudiant_data.username} enregistré avec succès. ID Utilisateur: {utilisateur_id}")
 
-                    # Créer l'étudiant avec l'ID de l'utilisateur
+                    # Créer l'etudiant avec l'ID de l'utilisateur
                     etudiant_creation_data = {
                         'matricule': etudiant_data.matricule,
                         'filiere_id': etudiant_data.filiere_id,
@@ -57,17 +59,80 @@ class EtudiantPresenter:
                         'utilisateur_id': utilisateur_id
                     }
                     await self.repository.create_etudiant(etudiant_creation_data)
-                    print(f"Étudiant créé avec succès pour l'utilisateur {etudiant_data.username}.")
+                    print(f"Etudiant créé avec succès pour l'utilisateur {etudiant_data.username}.")
 
                 # Si tout s'est bien passé, committer la transaction
                 await session.commit()
+               
+            
+                # Envoyer l'e-mail de bienvenue après la création réussie de l'étudiant
+                app_name = "SoutenanceManager"
+                subject = "Invitation à SoutenanceManager"
+                subject_with_app = f"[{app_name}] {subject}"
+                login_url = "http://localhost:3000/login"  # Remplacez par l'URL réelle de votre système de gestion
+                body = f"""
+                    <html>
+                        <head>
+                            <title>Invitation</title>
+                            <style>
+                                body {{
+                                    font-family: Arial, sans-serif;
+                                    background-color: #f5f5f5;
+                                }}
+                                .container {{
+                                    max-width: 600px;
+                                    margin: 0 auto;
+                                    padding: 20px;
+                                    background-color: #fff;
+                                    border: 1px solid #ccc;
+                                    border-radius: 5px;
+                                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                                }}
+                                .header {{
+                                    background-color: #007bff;
+                                    color: white;
+                                    padding: 10px;
+                                    text-align: center;
+                                    font-weight: bold;
+                                    border-top-left-radius: 5px;
+                                    border-top-right-radius: 5px;
+                                }}
+                                .button {{
+                                    display: inline-block;
+                                    background-color: #007bff;
+                                    color: white;
+                                    padding: 10px 20px;
+                                    text-decoration: none;
+                                    border-radius: 5px;
+                                    transition: background-color 0.3s ease;
+                                }}
+                                .button:hover {{
+                                    background-color: #0116b3;
+                                }}
+                            </style>
+                        </head>
+                        <body>
+                            <div class="container">
+                                <div class="header">{app_name}</div>
+                                <h2>Bienvenue dans le Système de Gestion des Soutenances</h2>
+                                <p>Bonjour {etudiant_data.username},</p>
+                                <p>Vous avez été ajouté au Système de Gestion des Soutenances. Vous pouvez maintenant vous connecter pour préparer votre soutenance.</p>
+                                <p>Pour commencer, veuillez cliquer sur le bouton ci-dessous :</p>
+                                <a href="{login_url}" class="button">Se connecter</a>
+                                <p>Cordialement,<br>L'équipe administrative de {app_name}</p>
+                            </div>
+                        </body>
+                    </html>
+                """
+                await send_email(etudiant_data.email, subject_with_app, body, app_name)
                 raise EtudiantExceptions().etudiant_create
+            
             except SQLAlchemyError as e:
                 print("Il y a eu une erreur:", e)
                 # Annuler la transaction en cas d'erreur
                 await session.rollback()
-                #self.user_repository.delete_user(13)
                 raise e
+            
             
             
 

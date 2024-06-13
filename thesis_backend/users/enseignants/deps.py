@@ -5,7 +5,7 @@ from users.auth.password_service import PasswordService
 from users.auth.repositories import UserRepositories
 from users.auth.token_service import TokenService
 from users.etudiants.schemas import FiliereSchema
-from .schemas import DepartementSchema, EnseignantSchema, CreateEnseignantSchema, UpdateEnseignantSchema
+from .schemas import DepartementSchema, EnseignantSchema, CreateEnseignantSchema, GradeSchema, UpdateEnseignantSchema
 from .repositories import EnseignantRepositories
 from sqlalchemy.ext.asyncio import AsyncSession
 from .presenter import EnseignantPresenter
@@ -91,6 +91,10 @@ response_data = {
     'get_departements': {
         'path': '/get_departements/',
         'response_model': List[DepartementSchema]
+    },
+    'get_grades': {
+        'path': '/get_grades/',
+        'response_model': List[GradeSchema]
     },
     'filieres_by_departement': {
         'path': '/departements/{departement_id}/filieres',

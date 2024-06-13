@@ -1,70 +1,51 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
-from .presenter import EtudiantPresenter
-from .schemas import CreateEtudiantSchema, EtudiantSchema, FiliereSchema, UpdateEtudiantSchema
+from .presenter import JuryPresenter
+from .schemas import CreateJurySchema, JurySchema, UpdateJurySchema
 from .deps import response_data,  get_presenter, \
     get_slug_user, get_updated_data_slug_user, get_limit_offset_user, \
     get_create_data_user
 
-etudiant_controllers = APIRouter(prefix='/etudiants', tags=['etudiants'])
+jury_controllers = APIRouter(prefix='/jurys', tags=['jurys'])
 
-@etudiant_controllers.get(**response_data.get('etudiants'))
-async def get_etudiants(
+@jury_controllers.get(**response_data.get('jurys'))
+async def get_jurys(
         limit: int | None = 20,
         offset: int | None = 0,
-        presenter: EtudiantPresenter = Depends(get_presenter),
+        presenter: JuryPresenter = Depends(get_presenter),
 ):
     data: dict = await get_limit_offset_user(limit, offset)
-    return await presenter.get_etudiants(**data)
+    return await presenter.get_jurys(**data)
 
-@etudiant_controllers.post(**response_data.get('create_etudiants'))
-async def create_etudiant(
-        etudiant_data: CreateEtudiantSchema,
-        presenter: EtudiantPresenter = Depends(get_presenter),
+@jury_controllers.post(**response_data.get('create_jurys'))
+async def create_jury(
+        jury_data: CreateJurySchema,
+        presenter: JuryPresenter = Depends(get_presenter),
 ):
-    data: dict = await get_create_data_user(etudiant_data)
-    return await presenter.create_etudiant(**data)
+    return await presenter.create_jury(jury_data)
 
-@etudiant_controllers.delete(**response_data.get('delete_etudiants'))
-async def delete_etudiant(
-        matricule: str,
-        presenter: EtudiantPresenter = Depends(get_presenter),
+
+@jury_controllers.delete(**response_data.get('delete_jurys'))
+async def delete_jury(
+        numero: str,
+        presenter: JuryPresenter = Depends(get_presenter),
 ):
-    data: dict = await get_slug_user(matricule)
-    return await presenter.delete_etudiant(**data)
+    data: dict = await get_slug_user(numero)
+    return await presenter.delete_jury(**data)
 
-@etudiant_controllers.patch(**response_data.get('update_etudiant'))
-async def update_etudiant(
-        matricule: str,
-        updated_data: UpdateEtudiantSchema,
-        presenter: EtudiantPresenter = Depends(get_presenter),
+@jury_controllers.patch(**response_data.get('update_jury'))
+async def update_jury(
+        numero: str,
+        updated_data: UpdateJurySchema,
+        presenter: JuryPresenter = Depends(get_presenter),
 ):
-    data: dict = await get_updated_data_slug_user(updated_data, matricule)
-    return await presenter.update_etudiant(**data)
+    data: dict = await get_updated_data_slug_user(updated_data, numero)
+    return await presenter.update_jury(**data)
 
-@etudiant_controllers.get(**response_data.get('etudiant'))
-async def get_etudiant(
-        matricule: str,
-        presenter: EtudiantPresenter = Depends(get_presenter),
+@jury_controllers.get(**response_data.get('jury'))
+async def get_jury(
+        numero: str,
+        presenter: JuryPresenter = Depends(get_presenter),
 ):
-    return await presenter.get_etudiant(etudiant_slug=matricule)
-
-@etudiant_controllers.get(**response_data.get('etudiants_by_filiere'))
-async def get_etudiants_by_filiere(
-        filiere_id: int,
-        limit: int | None = 20,
-        offset: int | None = 0,
-        presenter: EtudiantPresenter = Depends(get_presenter),
-):
-    data: dict = await get_limit_offset_user(limit, offset)
-    data['filiere_id'] = filiere_id
-    return await presenter.get_etudiants_by_filiere(**data)
-
-
-@etudiant_controllers.get('/get_filieres/', response_model=List[FiliereSchema])
-async def get_filieres(presenter: EtudiantPresenter = Depends(get_presenter)):
-    try:
-        return await presenter.get_filieres()
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+    return await presenter.get_jury(numero==numero)
 

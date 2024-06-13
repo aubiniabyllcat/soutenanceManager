@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -25,6 +25,15 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 30
 
     elastic_host: str = "localhost:9200"
+
+
+    DB_URL: str
+    SMTP_SERVER: str
+    SMTP_PORT: int
+    SMTP_USERNAME: str
+    SMTP_PASSWORD: str
+    FROM_EMAIL: str
+    APP_NAME: str
 
     class Config:
         env_file = '.env'

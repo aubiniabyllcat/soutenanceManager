@@ -12,8 +12,9 @@ from .models import Users
 class UserRepositories(UserRepositoriesInterface):
     session: AsyncSession
 
-    async def save_user(self, username: str, password: str, nom: str, prenoms: str, role_id: int) -> int:
+    async def save_user(self, username: str, email: str, password: str, nom: str, prenoms: str, role_id: int) -> int:
         stmt = insert(Users).values(
+            email=email,
             username=username,
             password=password,
             nom=nom,

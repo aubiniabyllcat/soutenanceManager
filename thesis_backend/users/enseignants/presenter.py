@@ -5,9 +5,10 @@ from database import AsyncSessionLocal
 from users.auth.exceptions import AuthExceptions
 from users.auth.interfaces.password_service_interface import PasswordServiceInterface
 from users.auth.interfaces.repositories_interface import UserRepositoriesInterface
+from users.auth.service_email import send_email
 from users.etudiants.exceptions import EtudiantExceptions
 from users.etudiants.schemas import FiliereSchema
-from .schemas import DepartementSchema, EnseignantSchema, UpdateEnseignantSchema, CreateEnseignantSchema
+from .schemas import DepartementSchema, EnseignantSchema, GradeSchema, UpdateEnseignantSchema, CreateEnseignantSchema
 from .interfaces.repositories_interface import EnseignantRepositoriesInterface
 from .exceptions import EnseignantExceptions
 from sqlalchemy.exc import SQLAlchemyError
@@ -44,6 +45,7 @@ class EnseignantPresenter:
                     # Enregistrer l'utilisateur et récupérer l'utilisateur_id
                     utilisateur_id = await self.user_repository.save_user(
                         username=enseignant_data.username,
+                        email=enseignant_data.email,
                         password=hashed_password,
                         nom=enseignant_data.nom,
                         prenoms=enseignant_data.prenoms,
@@ -54,7 +56,7 @@ class EnseignantPresenter:
                     # Créer l'enseignant avec l'ID de l'utilisateur
                     enseignant_creation_data = {
                         'matricule': enseignant_data.matricule,
-                        'grade': enseignant_data.grade,
+                        'grade_id': enseignant_data.grade_id,
                         'specialite': enseignant_data.specialite,
                         'departement_id': enseignant_data.departement_id,
                         'utilisateur_id': utilisateur_id
@@ -64,17 +66,74 @@ class EnseignantPresenter:
 
                 # Si tout s'est bien passé, committer la transaction
                 await session.commit()
+            
+                # Envoyer l'e-mail de bienvenue après la création réussie de l'étudiant
+                app_name = "SoutenanceManager"
+                subject = "Invitation à SoutenanceManager"
+                subject_with_app = f"[{app_name}] {subject}"
+                login_url = "http://localhost:3000/login"  # Remplacez par l'URL réelle de votre système de gestion
+                body = f"""
+                    <html>
+                        <head>
+                            <title>Invitation</title>
+                            <style>
+                                body {{
+                                    font-family: Arial, sans-serif;
+                                    background-color: #f5f5f5;
+                                }}
+                                .container {{
+                                    max-width: 600px;
+                                    margin: 0 auto;
+                                    padding: 20px;
+                                    background-color: #fff;
+                                    border: 1px solid #ccc;
+                                    border-radius: 5px;
+                                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                                }}
+                                .header {{
+                                    background-color: #007bff;
+                                    color: white;
+                                    padding: 10px;
+                                    text-align: center;
+                                    font-weight: bold;
+                                    border-top-left-radius: 5px;
+                                    border-top-right-radius: 5px;
+                                }}
+                                .button {{
+                                    display: inline-block;
+                                    background-color: #007bff;
+                                    color: white;
+                                    padding: 10px 20px;
+                                    text-decoration: none;
+                                    border-radius: 5px;
+                                    transition: background-color 0.3s ease;
+                                }}
+                                .button:hover {{
+                                    background-color: #0116b3;
+                                }}
+                            </style>
+                        </head>
+                        <body>
+                            <div class="container">
+                                <div class="header">{app_name}</div>
+                                <h2>Bienvenue dans le Système de Gestion des Soutenances</h2>
+                                <p>Bonjour {enseignant_data.username},</p>
+                                <p>Vous avez été ajouté au Système de Gestion des Soutenances. Vous pouvez maintenant vous connecter pour préparer votre soutenance.</p>
+                                <p>Pour commencer, veuillez cliquer sur le bouton ci-dessous :</p>
+                                <a href="{login_url}" class="button">Se connecter</a>
+                                <p>Cordialement,<br>L'équipe administrative de {app_name}</p>
+                            </div>
+                        </body>
+                    </html>
+                """
+                await send_email(enseignant_data.email, subject_with_app, body, app_name)
                 raise EnseignantExceptions().enseignant_create
             except SQLAlchemyError as e:
                 print("Il y a eu une erreur:", e)
                 # Annuler la transaction en cas d'erreur
                 await session.rollback()
                 raise e
-            except Exception as e:
-                print("Une erreur inattendue est survenue:", e)
-                # Annuler la transaction en cas d'erreur
-                await session.rollback()
-                raise e
+            
 
     async def delete_enseignant(self, enseignant_slug: str):
         data = { 'enseignant_slug': enseignant_slug}
@@ -101,6 +160,10 @@ class EnseignantPresenter:
     async def get_departements(self) -> List[DepartementSchema]:
         departements = await self.repository.get_departements()
         return [DepartementSchema.from_orm(departement) for departement in departements]
+    
+    async def get_grades(self) -> List[GradeSchema]:
+        grades = await self.repository.get_grades()
+        return [DepartementSchema.from_orm(grade) for grade in grades]
     
     async def get_filieres_by_departement(self, departement_id: int):
         try:

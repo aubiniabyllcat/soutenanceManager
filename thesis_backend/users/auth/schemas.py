@@ -6,10 +6,12 @@ class BaseUserAccountSchema(BaseModel):
 
 
 class CreateUserSchema(BaseUserAccountSchema):
+    email: str
     password: str
     nom: str
     prenoms: str
     role_id: int
+
 
 class CreateLoginSchema(BaseModel):
     username: str = Field(max_length=200)
