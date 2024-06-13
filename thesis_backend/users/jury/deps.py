@@ -4,10 +4,10 @@ from permissions import UserPermission
 from users.auth.password_service import PasswordService
 from users.auth.repositories import UserRepositories
 from users.auth.token_service import TokenService
-from .schemas import EtudiantSchema, CreateEtudiantSchema, FiliereSchema, UpdateEtudiantSchema
-from .repositories import EtudiantRepositories
+from .schemas import JurySchema, CreateJurySchema, UpdateJurySchema
+from .repositories import JuryRepositories
 from sqlalchemy.ext.asyncio import AsyncSession
-from .presenter import EtudiantPresenter
+from .presenter import JuryPresenter
 from database import get_db_session
 from passlib.context import CryptContext
 
@@ -18,76 +18,61 @@ from passlib.context import CryptContext
 #     }
 
 
-async def get_presenter(
-    session: AsyncSession = Depends(get_db_session)
-):
-    user_repository = UserRepositories(session=session)
-    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-    password_service = PasswordService(context=pwd_context)
-    presenter = EtudiantPresenter(
-        repository=EtudiantRepositories(session=session),
-        user_repository=user_repository,
-        password_service=password_service
-    )
+async def get_presenter(session=Depends(get_db_session)):
+    presenter = JuryPresenter(
+        repository=JuryRepositories(session=session))
     yield presenter
 
 
-async def get_etudiant_user(etudiant_id: int) -> dict:
-    return {'etudiant_id': etudiant_id}
+async def get_jury_user(jury_id: int) -> dict:
+    return {'jury_id': jury_id}
 
 
 async def get_limit_offset_user( limit: int, offset: int) -> dict:
     return { 'limit': limit, 'offset': offset}
 
 
-async def get_slug_user(etudiant_slug: str) -> dict:
-    return {'etudiant_slug': etudiant_slug}
+async def get_slug_user(numero: str) -> dict:
+    return {'numero': numero}
 
 
-async def get_updated_data_slug_user(updated_data: UpdateEtudiantSchema,
-                                         etudiant_slug: str,
+async def get_updated_data_slug_user(updated_data: UpdateJurySchema,
+                                         numero: str,
                                          ) -> dict:
     return {
         'updated_data': updated_data,
-        'etudiant_slug': etudiant_slug
+        'numero': numero
     }
 
 
 async def get_create_data_user(
-                                   etudiant_data: CreateEtudiantSchema) -> dict:
-    return { 'etudiant_data': etudiant_data}
+                                   jury_data: CreateJurySchema) -> dict:
+    return { 'jury_data': jury_data}
 
 
 response_data = {
     
-    'etudiants': {
+    'jurys': {
         'path': '/',
         'status_code': status.HTTP_200_OK,
         # 'response_model': list[ChannelSchema]
     },
-    'create_etudiants': {
+    'create_jurys': {
         'path': '/',
         'status_code': status.HTTP_201_CREATED,
     },
-    'delete_etudiants': {
-        'path': '/{matricule}',
+    'delete_jurys': {
+        'path': '/{numero}',
         'status_code': status.HTTP_204_NO_CONTENT,
     },
-    'update_etudiant': {
-        'path': '/{matricule}',
+    'update_jury': {
+        'path': '/{numero}',
         'status_code': status.HTTP_200_OK,
     },
-   'etudiant': {
-        'path': '/{matricule}',
+   'jury': {
+        'path': '/{numero}',
         'status_code': status.HTTP_200_OK,
-        'response_model': EtudiantSchema
+        'response_model': JurySchema
     },
-    'etudiants_by_filiere': {
-        'path': '/by-filiere/{filiere_id}',
-        'response_model': List[EtudiantSchema],
-    },
-    'get_filieres': {
-        'path': '/get_filieres/',
-        'response_model': List[FiliereSchema]
-    },
+    
 }

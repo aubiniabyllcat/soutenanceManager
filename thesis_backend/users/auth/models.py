@@ -4,6 +4,8 @@ from sqlalchemy import func, Column, Integer, String, DateTime,text, Time, Boole
 from sqlalchemy.orm import relationship
 from database import Base
 from sqlalchemy import UniqueConstraint
+from sqlalchemy import UniqueConstraint, CheckConstraint
+from sqlalchemy.orm import validates
 
 
 class Users(Base):
@@ -14,6 +16,7 @@ class Users(Base):
 
     id = Column(Integer, primary_key=True)
     username = Column(String(length=200), unique=True)
+    email = Column(String(length=200), nullable=False, unique=True)
     password = Column(String)
     nom = Column(String(length=200), nullable=False)
     prenoms = Column(String(length=200), nullable=False)
@@ -123,11 +126,12 @@ class Enseignant(Base):
     id = Column(Integer, primary_key=True)
     matricule = Column(String(length=200), nullable=False, unique=True)
     slug = Column(String)
-    grade = Column(String(length=200), nullable=False)
+    grade_id = Column(Integer,  ForeignKey('grade.id', ondelete='CASCADE'), nullable=False)
     specialite = Column(String(length=200), nullable=False) 
     utilisateur_id = Column(Integer,  ForeignKey('utilisateur.id', ondelete='CASCADE'), unique=True)
     departement_id = Column(ForeignKey('departement.id', ondelete='CASCADE'))
 
+    grade_rel = relationship('Grade', backref='enseignant')
     departement_rel = relationship('Departement', backref='enseignant')
     created = Column(DateTime, server_default=func.now())
     
@@ -145,6 +149,16 @@ class Departement(Base):
     def __repr__(self) -> str:
         return f'Departement: {self.nom}'
     
+class Grade(Base):
+    __tablename__ = 'grade'
+    __mapper_args__ = {'eager_defaults': True}
+
+    id = Column(Integer, primary_key=True)
+    nom = Column(String(150), nullable=False)
+    
+    def __repr__(self) -> str:
+        return f'Grade: {self.nom}'
+    
 class Chefdepartement(Base):
     __tablename__ = 'chef_departement'
 
@@ -160,7 +174,10 @@ class Chefdepartement(Base):
 
 class Jury(Base):
     __tablename__ = 'jury'
-    __table_args__ = {'schema': 'public'}
+    __table_args__ = (
+        UniqueConstraint('president_id', 'examinateur_id', 'rapporteur_id', name='uq_jury_composition'),
+        {'schema': 'public'}
+    )
 
     id = Column(Integer, primary_key=True)
     numero = Column(String(length=200), nullable=False, unique=True)
@@ -174,7 +191,14 @@ class Jury(Base):
 
     def __repr__(self) -> str:
         return f'Jury : {self.numero}'
-
+    
+    @validates('president_id', 'examinateur_id', 'rapporteur_id')
+    def validate_unique_enseignant(self, key, value):
+        ids = [self.president_id, self.examinateur_id, self.rapporteur_id]
+        ids.remove(value)
+        if value in ids:
+            raise ValueError("Un enseignant ne peut pas occuper plusieurs rôles dans le même jury.")
+        return value
 
 class Soutenance(Base):
     __tablename__ = 'soutenance'
@@ -189,7 +213,7 @@ class Soutenance(Base):
     
     enseignant_rel = relationship('Enseignant', backref='soutenance')
     created = Column(DateTime, server_default=func.now())
-    update_at = Column(String(length=200), nullable=True)
+    updated = Column(DateTime, server_default=func.now(), onupdate=func.now())
     
     def __repr__(self) -> str:
         return f'Soutenance: {self.theme}'

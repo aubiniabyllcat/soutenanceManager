@@ -73,12 +73,12 @@ class UserPresenter(CreateTokenMixin):
     }
     
 
-    async def sign_up(self, username: str, password: str, nom: str ,prenoms: str, role_id: int):
+    async def sign_up(self, username: str, email:str, password: str, nom: str ,prenoms: str, role_id: int):
         if await self.repository.receive_user_by_username(username=username):
             raise AuthExceptions().username_exists
         _password = await self.password_service \
             .hashed_password(password=password)
-        await self.repository.save_user(username=username, password=_password, nom=nom, prenoms=prenoms, role_id=role_id)
+        await self.repository.save_user(username=username, email=email, password=_password, nom=nom, prenoms=prenoms, role_id=role_id)
         raise AuthExceptions().user_create
 
     async def delete_user(self, utilisateur_id: int):

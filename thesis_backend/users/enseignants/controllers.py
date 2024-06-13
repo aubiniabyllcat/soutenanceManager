@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from users.etudiants.schemas import FiliereSchema
 from .presenter import EnseignantPresenter
-from .schemas import CreateEnseignantSchema, DepartementSchema, UpdateEnseignantSchema
+from .schemas import CreateEnseignantSchema, DepartementSchema, GradeSchema, UpdateEnseignantSchema
 from .deps import response_data,  get_presenter, \
     get_slug_user, get_updated_data_slug_user, get_limit_offset_user, \
     get_create_data_user
@@ -66,6 +66,13 @@ async def get_enseignants_by_departement(
 async def get_departements(presenter: EnseignantPresenter = Depends(get_presenter)):
     try:
         return await presenter.get_departements()
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+    
+@enseignant_controllers.get('/get_grades/', response_model=List[GradeSchema])
+async def get_grades(presenter: EnseignantPresenter = Depends(get_presenter)):
+    try:
+        return await presenter.get_grades()
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 

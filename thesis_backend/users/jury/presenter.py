@@ -3,99 +3,41 @@ from typing import List
 
 from database import AsyncSessionLocal
 from users.auth.exceptions import AuthExceptions
-from users.auth.interfaces.password_service_interface import PasswordServiceInterface
-from users.auth.interfaces.repositories_interface import UserRepositoriesInterface
-from .schemas import EtudiantSchema, FiliereSchema, UpdateEtudiantSchema, CreateEtudiantSchema
-from .interfaces.repositories_interface import EtudiantRepositoriesInterface
-from .exceptions import EtudiantExceptions
+from .schemas import JurySchema, UpdateJurySchema, CreateJurySchema
+from .interfaces.repositories_interface import JuryRepositoriesInterface
+from .exceptions import JuryExceptions
 from sqlalchemy.exc import SQLAlchemyError
 
 
 @dataclass
-class EtudiantPresenter:
-    repository: EtudiantRepositoriesInterface
-    user_repository: UserRepositoriesInterface
-    password_service: PasswordServiceInterface  
+class JuryPresenter:
+    repository: JuryRepositoriesInterface
 
-
-    async def get_etudiants(self,  limit: int, offset: int):
+    async def get_jurys(self,  limit: int, offset: int):
         data = { 'limit': limit, 'offset': offset}
-        return await self.repository.get_etudiants(**data)
+        return await self.repository.get_jurys(**data)
 
-    async def create_etudiant(self, etudiant_data: CreateEtudiantSchema):
-        async with AsyncSessionLocal() as session:
-            utilisateur_id = None  # Initialiser utilisateur_id à None
-            try:
-                async with session.begin():
-                    # Vérifier si l'utilisateur existe déjà
-                    if await self.user_repository.receive_user_by_username(username=etudiant_data.username):
-                        raise AuthExceptions().username_exists
+    async def create_jury(self, jury_data: CreateJurySchema):
+        return await self.repository.create_jury(jury_data)
 
-                    # Vérifier si le matricule existe déjà
-                    existing_etudiant = await self.repository.get_etudiant(etudiant_slug=etudiant_data.matricule)
-                    if existing_etudiant:
-                        raise EtudiantExceptions().etudiant_exists
 
-                    # Hacher le mot de passe
-                    hashed_password = await self.password_service.hashed_password(password=etudiant_data.password)
 
-                    # Enregistrer l'utilisateur et récupérer l'utilisateur_id
-                    utilisateur_id = await self.user_repository.save_user(
-                        username=etudiant_data.username,
-                        password=hashed_password,
-                        nom=etudiant_data.nom,
-                        prenoms=etudiant_data.prenoms,
-                        role_id=1  # Role ID pour étudiant
-                    )
-                    print(f"Utilisateur {etudiant_data.username} enregistré avec succès. ID Utilisateur: {utilisateur_id}")
+    async def delete_jury(self, numero: str):
+        data = { 'numero': numero}
+        if not await self.repository.delete_jury(**data):
+            raise JuryExceptions().jury_not_found
 
-                    # Créer l'étudiant avec l'ID de l'utilisateur
-                    etudiant_creation_data = {
-                        'matricule': etudiant_data.matricule,
-                        'filiere_id': etudiant_data.filiere_id,
-                        'annee_id': etudiant_data.annee_id,
-                        'utilisateur_id': utilisateur_id
-                    }
-                    await self.repository.create_etudiant(etudiant_creation_data)
-                    print(f"Étudiant créé avec succès pour l'utilisateur {etudiant_data.username}.")
-
-                # Si tout s'est bien passé, committer la transaction
-                await session.commit()
-                raise EtudiantExceptions().etudiant_create
-            except SQLAlchemyError as e:
-                print("Il y a eu une erreur:", e)
-                # Annuler la transaction en cas d'erreur
-                await session.rollback()
-                raise e
-            except Exception as e:
-                # print("Une erreur inattendue est survenue:", e)
-                # Annuler la transaction en cas d'erreur
-                await session.rollback()
-                raise e
-            
-
-    async def delete_etudiant(self, etudiant_slug: str):
-        data = { 'etudiant_slug': etudiant_slug}
-        if not await self.repository.delete_etudiant(**data):
-            raise EtudiantExceptions().etudiant_not_found
-
-    async def update_etudiant(self, etudiant_slug: str, updated_data: UpdateEtudiantSchema):
+    async def update_jury(self, numero: str, updated_data: UpdateJurySchema):
         if updated_data.is_empty:
-            raise EtudiantExceptions().empty_data
-        return await self.repository.update_etudiant(
-             etudiant_slug=etudiant_slug, updated_data=updated_data
+            raise JuryExceptions().empty_data
+        return await self.repository.update_jury(
+             numero=numero, updated_data=updated_data
         )
 
-    async def get_etudiant(self, etudiant_slug: str):
-        data = {'etudiant_slug': etudiant_slug}
-        if (result := await self.repository.get_etudiant(**data)) is None:
-            raise EtudiantExceptions().etudiant_not_found
+    async def get_jury(self, numero: str):
+        data = {'numero': numero}
+        if (result := await self.repository.get_jury(**data)) is None:
+            raise JuryExceptions().jury_not_found
         return result
 
-    async def get_etudiants_by_filiere(self, filiere_id: int, limit: int, offset: int) -> List[EtudiantSchema]:
-        return await self.repository.get_etudiants_by_filiere(filiere_id, limit, offset)
     
-    
-    async def get_filieres(self) -> List[FiliereSchema]:
-        filieres = await self.repository.get_filieres()
-        return [FiliereSchema.from_orm(filiere) for filiere in filieres]

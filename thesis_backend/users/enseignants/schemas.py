@@ -6,11 +6,12 @@ from users.profile.schemas import UserSchema
 
 class CreateEnseignantSchema(BaseModel):
     username: str
+    email: str
     password: str
     nom: str
     prenoms: str
     matricule: str
-    grade: str
+    grade_id: int
     specialite: str
     departement_id: int 
     
@@ -30,18 +31,27 @@ class EnseignantSchema(BaseModel):
     id: int
     slug: str | None
     matricule: str
-    grade: str
+    grade_id: int
     specialite: str
     departement_id: int
     created: datetime
 
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class DepartementSchema(BaseModel):
     id: int
     nom: str 
     
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+class GradeSchema(BaseModel):
+    id: int
+    nom: str 
+    
+    class Config:
+        from_attributes = True
+
+        

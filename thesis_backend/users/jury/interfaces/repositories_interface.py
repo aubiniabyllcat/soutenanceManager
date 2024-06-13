@@ -1,38 +1,29 @@
 from abc import ABC, abstractmethod
-from ..schemas import CreateEtudiantSchema, UpdateEtudiantSchema
+from ..schemas import CreateJurySchema, UpdateJurySchema
 
 
-class EtudiantRepositoriesInterface(ABC):
+class JuryRepositoriesInterface(ABC):
 
     @abstractmethod
-    async def get_etudiants(self, utilisateur_id: int, limit: int, offset: int):
+    async def get_jurys(self, numero: str, limit: int, offset: int):
         pass
 
     @abstractmethod
-    async def get_filieres(self, limit: int, offset: int):
+    async def create_jury(
+            self, jury_data: CreateJurySchema):
         pass
 
     @abstractmethod
-    async def create_etudiant(
-            self, etudiant_data: CreateEtudiantSchema):
+    async def delete_jury(self, numero: str):
         pass
 
     @abstractmethod
-    async def delete_etudiant(self, utilisateur_id: int, etudiant_slug: str):
-        pass
-
-    async def update_etudiant(
-            self, utilisateur_id: int, etudiant_slug: str,
-            updated_data: UpdateEtudiantSchema
+    async def update_jury(
+            self, numero: str,
+            updated_data: UpdateJurySchema
     ):
         pass
 
     @abstractmethod
-    async def get_etudiant(self, etudiant_slug: str):
+    async def get_jury(self, numero: str):
         pass
-
-    @abstractmethod
-    async def get_etudiants_by_filiere(self, filiere_id: int, limit: int, offset: int):
-        pass
-
-    

@@ -13,6 +13,10 @@ class EnseignantRepositoriesInterface(ABC):
         pass
 
     @abstractmethod
+    async def get_grades(self, limit: int, offset: int):
+        pass
+
+    @abstractmethod
     async def get_enseignants_by_departement(self, departement_id: int, limit: int, offset: int):
         pass
 

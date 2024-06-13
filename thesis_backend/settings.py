@@ -26,6 +26,15 @@ class Settings(BaseSettings):
 
     elastic_host: str = "localhost:9200"
 
+
+    DB_URL: str
+    SMTP_SERVER: str
+    SMTP_PORT: int
+    SMTP_USERNAME: str
+    SMTP_PASSWORD: str
+    FROM_EMAIL: str
+    APP_NAME: str
+
     class Config:
         env_file = '.env'
         env_file_encoding = 'utf-8'

@@ -1,4 +1,5 @@
-from pydantic import BaseModel, Field
+from typing import List
+from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
 
 from users.profile.schemas import UserSchema
@@ -7,6 +8,7 @@ from users.profile.schemas import UserSchema
 class CreateEtudiantSchema(BaseModel):
     username: str
     password: str
+    email: str
     nom: str
     prenoms: str
     matricule: str
@@ -31,7 +33,7 @@ class EtudiantSchema(BaseModel):
     annee_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class FiliereSchema(BaseModel):
     id: int
@@ -39,4 +41,8 @@ class FiliereSchema(BaseModel):
     departement_id: int
 
     class Config:
-            orm_mode = True
+        from_attributes = True
+
+class EmailSchema(BaseModel):
+    email: List[EmailStr]
+    
